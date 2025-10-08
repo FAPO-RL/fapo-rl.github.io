@@ -1,9 +1,9 @@
 ---
 layout: ../layouts/Layout.astro
-title: FAPO: Flawed-Aware Policy Optimization for Efficient and Reliable Reasoning
+title: "FAPO: Flawed-Aware Policy Optimization for Efficient and Reliable Reasoning"
 description: Simple project page template for your research paper, built with Astro and Tailwind CSS
-favicon: favicon.svg
-thumbnail: screenshot-light.png
+favicon: ""
+thumbnail: ""
 ---
 
 import Header from "../components/Header.astro";
@@ -25,6 +25,12 @@ import Splat from "../components/Splat.tsx"
 import dogsDiffc from "../assets/dogs-diffc.png"
 import dogsTrue from "../assets/dogs-true.png"
 
+import introMain from "../assets/intro_main.png"
+import preliminaryMain from "../assets/preliminary-fp.png"
+import genrmMain from "../assets/genrm-fp.png"
+import expMain from "../assets/experiment_main.png"
+import infraMain from "../assets/infra-design.png"
+
 
 import CodeBlock from "../components/CodeBlock.astro";
 import Table from "../components/Table.astro";
@@ -34,37 +40,49 @@ export const components = {pre: CodeBlock, table: Table}
   title={frontmatter.title}
   authors={[
     {
-      name: "Roman Hauksson",
-      url: "https://roman.technology",
-      institution: "University of Texas at Dallas",
-      notes: ["*", "†"],
+      name: "Yuyang Ding",
+      url: "https://yyding1.github.io/",
+      institution: "Soochow University",
+      email: "yyding23@stu.suda.edu.cn",
+      notes: ["†", "‡"],
     },
     {
-      name: "Author Two",
-      institution: "Institution Two",
-      notes: ["*", "†"],
+      name: "Chi Zhang",
+      url: "https://sites.google.com/view/chizhang-usc/",
+      institution: "ByteDance Seed",
+      email: "zhangchi.usc1992@bytedance.com",
+      notes: ["‡"],
     },
     {
-      name: "Author Three",
-      institution: "Institution Three",
+      name: "Juntao Li",
+      url: "https://lijuntaopku.github.io/",
+      institution: "Soochow University",
+      email: "ljt@suda.edu.cn",
+      notes: ["†", "*"],
+    },
+    {
+      name: "Haibin Lin",
+      url: "https://sites.google.com/view/haibinlin/",
+      institution: "ByteDance Seed",
+      email: "haibin.lin@bytedance.com",
+      notes: ["‡"],
+    },
+    {
+      name: "Xin Liu",
+      url: "https://openreview.net/profile?id=~Xin_Liu51",
+      institution: "ByteDance Seed",
+      email: "liuxin.ai@bytedance.com",
+      notes: ["‡"],
+    },
+    {
+      name: "Min Zhang",
+      url: "https://zhangmin-nlp-ai.github.io/",
+      institution: "Soochow University",
+      email: "minzhang@suda.edu.cn",
       notes: ["†"],
     },
-    {
-      name: "Author Four",
-      institution: "Institution Four",
-    },
   ]}
-  conference="Conference Name"
-  notes={[
-    {
-      symbol: "*",
-      text: "author note one",
-    },
-    {
-      symbol: "†",
-      text: "author note two",
-    },
-  ]}
+  conference=""
   links={[
     {
       name: "Paper",
@@ -73,7 +91,7 @@ export const components = {pre: CodeBlock, table: Table}
     },
     {
       name: "Code",
-      url: "https://github.com/RomanHauksson/academic-project-astro-template",
+      url: "",
       icon: "ri:github-line",
     },
     {
@@ -82,92 +100,183 @@ export const components = {pre: CodeBlock, table: Table}
       icon: "academicons:arxiv",
     },
     {
-      name: "Bluesky",
-      url: "",
-      icon: "ri:bluesky-line"
+      name: "Collection",
+      url: "https://huggingface.co/collections/dyyyyyyyy/fapo-68e651650ba668ae5b541f1c",
+      icon: "simple-icons:huggingface"
     }
   ]}
   />
 
-<Video source={outside} />
+<Figure>
+  <Image slot="figure" source={introMain} altText="Comparison between FAPO models and their baselines thoughout RL training." />
+  <Fragment slot="caption">Comparison between FAPO models and their baselines thoughout RL training. FAPO enhances outcome correctness, improves process reliability, and training efficiency and stability, all without increasing the token budget.</Fragment>
+</Figure>
 
 <HighlightedSection>
-
-## Abstract
-
-This is a live demo for a template you can use to create a simple project page for your research paper. See the code for the template and instructions on how to use it yourself [here](https://github.com/RomanHauksson/academic-project-astro-template). It's made with the [Astro web framework](https://astro.build/) and styled with [Tailwind CSS](https://tailwindcss.com/). You write the content in [MDX](https://mdxjs.com/), which enables markdown formatting like **bold**, _italics_, and ~strikethrough~, as well as custom components like <SmallCaps>small caps.</SmallCaps>
-
+  <blockquote class="text-lg md:text-xl leading-relaxed text-zinc-900 dark:text-zinc-50 italic">
+    "Language models hallucinate because their training and evaluation processes favor confident guesses over the acknowledgment of uncertainty. Fundamentally, these hallucinations arise as errors in binary classification."
+  </blockquote>
+  <cite class="ml-auto">
+    — [OpenAI: Why Language Models Hallucinate](https://arxiv.org/pdf/2509.04664)
+  </cite>
+  In the context of reinforcement learning, we call these _"confident guesses"_ as _"flawed positives"_, where such flawed guessing rollouts are treated as confident positive signals for policy optimization, thereby reinforcing unreliable reasoning patterns.
+  In this work, we dive into this dilemma, and propose **F**lawed-**A**ware **P**olicy **O**ptimization (**FAPO**), demonstrating the great potential of acknowledging and penalizing these uncertain or flawed patterns to ensure efficient and reliable reasoning.
 </HighlightedSection>
 
-## Figures
 
-Use the figure component to display images, videos, equations, or any other element, with an optional caption.
-
-<Figure>
-  <Image slot="figure" source={transformer} altText="Diagram of the transformer deep learning architecture." />
-  <Fragment slot="caption">Diagram of the transformer deep learning architecture.</Fragment>
-</Figure>
-
-## Image comparison slider
-
-An interactive, accessible slider component with keyboard navigation.
+## <center>Distribution and Impact of Flawed Positives in RL</center>
 
 <Figure>
-  <ImageComparison slot="figure" client:load imageOne={dogsDiffc} imageTwo={dogsTrue} altTextOne="Photo of two dogs running side-by-side in shallow water, lossily compressed using the DiffC algorithm" altTextTwo="Original photo of two dogs running side-by-side in shallow water" />
-  <Fragment slot="caption">A photo of two dogs running side-by-side in shallow water, lossily compressed using the [DiffC algorithm](https://jeremyiv.github.io/diffc-project-page/).</Fragment>
+  <Image slot="figure" source={preliminaryMain} altText="Preliminary Results about the distribution and impact of flawed positives." />
+  <Fragment slot="caption">Preliminary Results about the distribution and impact of flawed positives.</Fragment>
 </Figure>
 
-## Two columns
+### Key Ovservations:
 
-Use the two columns component to display two columns of content. In this example, the first column contains a figure with a YouTube video and the second column contains a figure with a custom [React](https://react.dev/) component. By default, they display side by side, but if the screen is narrow enough (for example, on mobile), they're arranged vertically.
+**Flawed Positives are Prevalent in Initial Checkpoints (Figure a):**
+Flawed positives are prevalent across various LLMs (Pre-Trained Model, Instruct Model, and Think Model), which stablish the starting conditions for subsequent RL optimization, accounting for 20%–40% of correct rollouts.
+
+**Flawed Positives are Stepping Stones in Learning (Figure b):**
+Flawed positives are most prevalent during the early learning stages but diminish significantly as per-sample confidence improves.
+This highlights their expected role as natural stepping stones in the learning trajectory, allowing the model to initially reach correct answers before gradually evolving the capability to produce fully correct solutions.
+
+**Flawed Positives Persist throughout RL Training (Figure c):**
+As the RL training progresses, flawed-positive ratio remains almost constant at around 30%.
+This indicates that the optimization process struggles to shift from unreliable reasoning to genuine problem-solving.
+
+**Flawed Positives Exert Twofold Effects (Figure d):**
+Assigning negative optimization signals to flawed positives yields substantial performance improvements, although the gains appear more gradually in the early training stages.
+These findings reveal that flawed positives **exert a twofold effect**:
+<u>_(1) flawed positives act as stepping stones, enabling the model to achieve rapid capability gains in the early stages,
+and (2) their improper reward assignment can trap optimization in unreliable reasoning_</u>.
+
+## <center>Flawed-Aware Policy Optimization</center>
+
+
+### Baseline RL setting
+
+Based on GRPO, we also adopt several effective effective strategies such as clip-higher and token-level loss as our standard baseline RL setting.
+
+<LaTeX formula="
+\begin{aligned}
+    &\mathcal{J}(\theta) = \mathbb{E}_{(q, a)\sim \mathcal{D},\{o_i\}_{i=1}^{G}\sim\pi_{\theta_\text{old}}(\cdot|q)} \\
+    &\;\;\frac{1}{\sum_{i=1}^{G}|o_i|}\sum_{i=1}^{G}\sum_{t=1}^{|o_i|}\left\{\min \left[\frac{\pi_\theta(o_t|q, o_{<t})}{\pi_{\theta_\text{old}}(o_t|q, o_{<t})}\hat{A}_{i,t}, \text{clip}(\frac{\pi_\theta(o_t|q, o_{<t})}{\pi_{\theta_\text{old}}(o_t|q, o_{<t})}, 1-\epsilon_{l}, 1+\epsilon_{h})\hat{A}_{i,t}\right]\right\}.
+\end{aligned}
+" />
+where <LaTeX inline formula="(q, a)" /> denotes a question-answer pair sampled from the data distribution <LaTeX inline formula="\mathcal{D}" />, <LaTeX inline formula="\pi_{\theta_{\text{old}}}" /> is the old policy, and <LaTeX inline formula="\epsilon" /> controls the clipping range in importance sampling for stability.
+
+### FAPO-GenRM
+
+We first train a generative reward model (GenRM) to detect flawed-positives accurately and comprehensively, with the following RL reward reformulation:
+
+<LaTeX formula="
+\begin{aligned}
+  &R_\text{FAPO-GenRM} = R_\text{Outcome} \mathbf{\textbf{+} R_\textbf{Process}} \\
+  &\text{where}\;
+  R_\text{Outcome} =
+  \begin{cases}
+  1, & \text{If}\;\;\hat{y}_\theta = y^* \\
+  -1, & \text{Otherwise}
+  \end{cases}
+  ,\;
+  R_\text{Process} =
+  \begin{cases}
+  - \frac{|\hat{t}_\theta - t^*|}{n}, & \text{If}\;\; \hat{y}_\theta = y^* = \text{FP} \\
+  0, & \text{Otherwise}
+  \end{cases}.
+\end{aligned}
+" />
+
+Here, <LaTeX inline formula="\hat{t}_\theta" /> and <LaTeX inline formula="t^*" /> denote the predicted and ground-truth error indices, and <LaTeX inline formula="n" /> is the total number of steps, ensuring <LaTeX inline formula="R_\text{Process}\in [-1, 0]" />.
+The process penalty is distance-sensitive: predictions closer to the true error receive higher rewards, while those farther away incur stronger penalties.
+This design guides the model toward precise error localization and fosters genuine error-detection ability, rather than mere guessing.
+
+### FAPO-Reasoning
+
+With the GenRM detecting flawed positives, we then regulate their roles in the final RL optimization.
+We introduce a reward-penalization mechanism with a group-relative advantage estimation:
+
+<LaTeX formula="
+\begin{aligned}
+R_\text{FAPO}&(o, a^*|\theta) = R_\text{RLVR}(o, a^*) \mathbf{\textbf{+} R_\Delta(o,a^* | \theta)}, \\
+&\text{where}\; R_\Delta(o,a^* | \theta) = 
+\begin{cases}
+-\lambda, & \text{If}\;\;\mathcal{I}(o, a^*)\;\text{and}\;\hat{y}_\theta(o, a^*)=\text{FP} \\
+0, & \text{Otherwise}
+\end{cases}, \\
+\hat{A}_{i,t} &= \left[r_i - \text{mean}(\{R_{i}\}_{i=1}^G)\right] / \text{std}(\{R_{i}\}_{i=1}^G).
+\end{aligned}
+" />
+
+### Theoretical Analysis about FAPO
+
+The advantage estimation of FAPO can be expressed as that of GRPO:
+<LaTeX formula="
+\begin{cases}
+\mu_\text{FAPO} = \mu_\text{GRPO} - \lambda\gamma \\
+\sigma_\text{FAPO}^2 = \sigma_\text{GRPO}^2 + \lambda \gamma(1-\gamma) (\lambda - \frac{4}{\alpha / \beta + 1})
+\end{cases}
+" />
+Our theoretical analysis demonstrate that:
+optimization direction moves from warm-up to refinement if the ratio of positive (<LaTeX inline formula="\alpha" />) to negative (<LaTeX inline formula="\beta" />) samples (<LaTeX inline formula="\rho = \frac{\alpha}{\beta}" />) exceeds <LaTeX inline formula="\frac{2}{\lambda} - 1" />.
+Furthermore, when <LaTeX inline formula="\rho > \frac{4}{\lambda} - 1" />, the advantage for positive samples is downscaled to stabilize training.
+In terms of <LaTeX inline formula="\lambda" />, we adopt a majority-guided strategy, which yields <LaTeX inline formula="\rho_\text{shift} = 1" />, further determining <LaTeX inline formula="\lambda = 1" />.
+
+Overall, FAPO provides a principled mechanism for guiding the optimization process, aligning with the ideal learning trajectory where the focus initially lies in producing correct solutions when model capability is limited, and naturally shifts toward refining reliability once correct rollouts surpass incorrect ones.
+
+
+## <center>Experiments</center>
+
+### FAPO-GenRM
+
+<Figure>
+  <Image slot="figure" source={genrmMain} altText="Performance Comparison between FAPO-GenRM-4B and other SoTA Models." />
+  <Fragment slot="caption">Performance Comparison between FAPO-GenRM-4B and other SoTA Models.</Fragment>
+</Figure>
+
+FAPO-GenRM-4B achieves substantial improvements on both FlawedPositiveBench and ProcessBench, even outperforming the teacher model Qwen3-32B, further demonstrating the effectiveness of our approach.
+
+We have also open-sourced the training dataset [FAPO-Critic-85K](), [training scripts](), and the [final checkpoint]().
+
+### FAPO-Reasoning
+
+<Figure>
+  <Image slot="figure" source={expMain} altText="Comparison between FAPO-Reasoning and the baseline." />
+  <Fragment slot="caption">Comparison between FAPO-Reasoning and the baseline.</Fragment>
+</Figure>
+
+We evaluate FAPO Models in AIME24, AIME25 (Math Domain), and GPQA-Diamond (General Domain), demonstrate the great potential of FAPO in:
+
+(1) **Outcome Correctness:** FAPO consistently maintains a clear advantage of accuracy over the baselines.
+
+(2) **Process Reliability:** FAPO responses exhibit a substantially lower flawed-positive ratio.
+
+(3) **Training Stability:** By mitigating the impact of flawed positives, training stability is enhanced.
+
+We have also open-sourced the [training scripts](), and the [final checkpoint]().
+
+## Infrastructure design
 
 <TwoColumns>
-  <Figure slot="left">
-    <YouTubeVideo slot="figure" videoId="wjZofJX0v4M" />
-    <Fragment slot="caption">Take a look at this YouTube video.</Fragment>
-  </Figure>
+  <text slot="left">
+    Introducing generative reward models (GenRMs) may have a considerable impact on the whole RL process, influencing both algorithmic effectiveness and infrastructure efficiency.
+    Below, we outline the following roadmap (part implemented):
+
+    [[1/N]: Standalone GenRM seperated from Rollout.](https://github.com/volcengine/verl/pull/3679)
+
+    [[2/N]: GenRM router to distribute request.](https://github.com/volcengine/verl/pull/3679)
+
+    [3/N]: Mixture of colocate and standalone mode.
+
+    [4/N]: Fully Async RL Pipeline Construction.
+  </text>
   <Figure slot="right">
-    <Splat slot="figure" client:idle />
-    <Fragment slot="caption">Now look at this [Gaussian splat](https://en.wikipedia.org/wiki/Gaussian_splatting), rendered with a React component.</Fragment>
+    <Image slot="figure" source={infraMain} altText="Infra Design" />
   </Figure>
 </TwoColumns>
-
-## Heading levels
-
-Use headings to divide your content into sections.
-
-### Heading 3
-
-Go down a level to heading 3...
-
-#### Heading 4
-
-...and down again to heading 4.
-
-## LaTeX
-
-You can also add LaTeX formulas, rendered during the build process using [KaTeX](https://katex.org/) so they're quick to load for visitors of your project page. You can write them inline, like this: <LaTeX inline formula="a^2 + b^2 = c^2" />. Or, you can write them as a block:
-
-<LaTeX formula="\int_a^b f(x) dx" />
-
-## Tables
-
-You can add simple tables using [GitHub Flavored Markdown syntax](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/organizing-information-with-tables):
-
-| Model | Accuracy | F1 score | Training time (hours) |
-| :--- | :---: | :---: | :---: |
-| BERT-base | 0.89 | 0.87 | 4.5 |
-| RoBERTa-large | 0.92 | 0.91 | 7.2 |
-| DistilBERT | 0.86 | 0.84 | 2.1 |
-| XLNet | 0.90 | 0.89 | 6.8 |
 
 ## BibTeX citation
 
 ```bibtex
-@misc{roman2024academic,
-  author = "{Roman Hauksson}",
-  title = "Academic Project Page Template",
-  year = "2024",
-  howpublished = "\url{https://research-template.roman.technology}",
-}
+coming soon
 ```
