@@ -105,7 +105,9 @@ export const components = {pre: CodeBlock, table: Table}
       icon: "simple-icons:huggingface"
     }
   ]}
-  />
+/>
+
+_We have also implemented a more flexible and easy-to-use infra design for reward models, which has been added to the [veRL](https://github.com/volcengine/verl) repo in [this PR](https://github.com/volcengine/verl/pull/3679) and will be merged as a key feature in a future release. Welcome to use it!_
 
 <Figure>
   <Image slot="figure" source={introMain} altText="Comparison between FAPO models and their baselines thoughout RL training." />
@@ -113,13 +115,14 @@ export const components = {pre: CodeBlock, table: Table}
 </Figure>
 
 <HighlightedSection>
+  Let's start with a recent OpenAI study on LLM hallucinations:
   <blockquote class="text-lg md:text-xl leading-relaxed text-zinc-900 dark:text-zinc-50 italic">
     "Language models hallucinate because their training and evaluation processes favor confident guesses over the acknowledgment of uncertainty. Fundamentally, these hallucinations arise as errors in binary classification."
   </blockquote>
   <cite class="ml-auto">
     — [OpenAI: Why Language Models Hallucinate](https://arxiv.org/pdf/2509.04664)
   </cite>
-  In the context of reinforcement learning, we call these _"confident guesses"_ as _"flawed positives"_, where such flawed guessing rollouts are treated as confident positive signals for policy optimization, thereby reinforcing unreliable reasoning patterns.
+  In the context of reinforcement learning, we refer to these _"confident guesses"_ as _"flawed positives"_, where such flawed guessing rollouts are treated as confident positive signals for policy optimization, thereby reinforcing unreliable reasoning patterns.
   In this work, we dive into this dilemma, and propose **F**lawed-**A**ware **P**olicy **O**ptimization (**FAPO**), demonstrating the great potential of acknowledging and penalizing these uncertain or flawed patterns to ensure efficient and reliable reasoning.
 </HighlightedSection>
 
@@ -164,6 +167,18 @@ Based on GRPO, we also adopt several effective effective strategies such as clip
 \end{aligned}
 " />
 where <LaTeX inline formula="(q, a)" /> denotes a question-answer pair sampled from the data distribution <LaTeX inline formula="\mathcal{D}" />, <LaTeX inline formula="\pi_{\theta_{\text{old}}}" /> is the old policy, and <LaTeX inline formula="\epsilon" /> controls the clipping range in importance sampling for stability.
+The advantage <LaTeX inline formula="A_{i,t}" /> is estimated in a group-relative manner:
+
+<LaTeX formula="
+\hat{A}_{i,t} = (r_i - \mu_\text{GRPO}) / \sigma_\text{GRPO}, \;\; \text{where} \\
+\mu_\text{GRPO} = \text{mean}(\{R_{i}\}_{i=1}^G);\;\; \sigma_\text{GRPO} = \text{std}(\{R_{i}\}_{i=1}^G); \;\;
+r_i = R_\text{rule}(o, a^*) =
+\begin{cases}
+1, & \text{If}\;\;o = a^* \\
+-1, & \text{Otherwise}
+\end{cases}
+" />
+where <LaTeX inline formula="o" /> is the predicted final answer of old policy and <LaTeX inline formula="a^*" /> denotes the ground truth.
 
 ### FAPO-GenRM
 
@@ -189,7 +204,7 @@ We first train a generative reward model (GenRM) to detect flawed-positives accu
 
 Here, <LaTeX inline formula="\hat{t}_\theta" /> and <LaTeX inline formula="t^*" /> denote the predicted and ground-truth error indices, and <LaTeX inline formula="n" /> is the total number of steps, ensuring <LaTeX inline formula="R_\text{Process}\in [-1, 0]" />.
 The process penalty is distance-sensitive: predictions closer to the true error receive higher rewards, while those farther away incur stronger penalties.
-This design guides the model toward precise error localization and fosters genuine error-detection ability, rather than mere guessing.
+<u>_This design guides the model toward precise error localization and fosters genuine error-detection ability, rather than mere guessing._</u>
 
 ### FAPO-Reasoning
 
@@ -208,18 +223,41 @@ R_\text{FAPO}&(o, a^*|\theta) = R_\text{RLVR}(o, a^*) \mathbf{\textbf{+} R_\Delt
 \end{aligned}
 " />
 
-### Theoretical Analysis about FAPO
+### Theoretical Analysis about FAPO Effectiveness
 
-The advantage estimation of FAPO can be expressed as that of GRPO:
+We demonstrate the whole learning process and how FAPO leverage flawed positives.
+The advantage estimation of FAPO can be formulated in that of GRPO:
 <LaTeX formula="
+\begin{aligned}
 \begin{cases}
 \mu_\text{FAPO} = \mu_\text{GRPO} - \lambda\gamma \\
 \sigma_\text{FAPO}^2 = \sigma_\text{GRPO}^2 + \lambda \gamma(1-\gamma) (\lambda - \frac{4}{\alpha / \beta + 1})
 \end{cases}
+\end{aligned}
 " />
-Our theoretical analysis demonstrate that:
-optimization direction moves from warm-up to refinement if the ratio of positive (<LaTeX inline formula="\alpha" />) to negative (<LaTeX inline formula="\beta" />) samples (<LaTeX inline formula="\rho = \frac{\alpha}{\beta}" />) exceeds <LaTeX inline formula="\frac{2}{\lambda} - 1" />.
-Furthermore, when <LaTeX inline formula="\rho > \frac{4}{\lambda} - 1" />, the advantage for positive samples is downscaled to stabilize training.
+where <LaTeX inline formula="\alpha, \beta, \gamma" /> denote the positive rate, negative rate, and flawed positive rate, respectively, and we propose <LaTeX inline formula="\rho = \frac{\alpha}{\beta}" /> to represent the current learning progress.
+
+The role of flawed positive shift when optimization progress, specifically:
+<LaTeX formula="
+\begin{aligned}
+\hat{A}_\text{Flawed} = \frac{1 - \lambda - \mu_\text{FAPO}}{\sigma_\text{FAPO}} < 0
+\; \Leftrightarrow \; \lambda > \frac{2\beta}{\alpha + \beta} = \frac{2}{\alpha / \beta + 1}
+\; \Leftrightarrow \; \rho = \frac{\alpha}{\beta} > \frac{2}{\lambda} - 1
+\end{aligned}
+" />
+The scaling factor <LaTeX inline formula="\sigma_\text{FAPO}^2" /> changes over <LaTeX inline formula="\sigma_\text{GRPO}^2" /> when:
+<LaTeX formula="
+\begin{aligned}
+\sigma_\text{FAPO}^2-\sigma_\text{GRPO}^2 &= \lambda \gamma(1-\gamma) (\lambda - \frac{4}{\alpha / \beta + 1}) \\
+\therefore
+\text{when }\frac{\alpha}{\beta} < \frac{4}{\lambda} - 1 \Rightarrow \sigma_\text{FAPO}^2 < &\sigma_\text{GRPO}^2; \;\;
+\text{when }\frac{\alpha}{\beta} > \frac{4}{\lambda} - 1 \Rightarrow \sigma_\text{FAPO}^2 > \sigma_\text{GRPO}^2
+\end{aligned}
+" />
+
+
+So the optimization direction moves from warm-up to refinement if current learning progress <LaTeX inline formula="\rho" /> exceeds <LaTeX inline formula="\frac{2}{\lambda} - 1" />.
+Furthermore, when <LaTeX inline formula="\rho > \frac{4}{\lambda} - 1" />, the advantage estimation is downscaled to stabilize training.
 In terms of <LaTeX inline formula="\lambda" />, we adopt a majority-guided strategy, which yields <LaTeX inline formula="\rho_\text{shift} = 1" />, further determining <LaTeX inline formula="\lambda = 1" />.
 
 Overall, FAPO provides a principled mechanism for guiding the optimization process, aligning with the ideal learning trajectory where the focus initially lies in producing correct solutions when model capability is limited, and naturally shifts toward refining reliability once correct rollouts surpass incorrect ones.
