@@ -85,13 +85,13 @@ export const components = {pre: CodeBlock, table: Table}
   conference=""
   links={[
     {
-      name: "Paper",
-      url: "",
-      icon: "ri:file-pdf-2-line",
+      name: "Homepage",
+      url: "https://fapo-rl.github.io",
+      icon: "lucide:home",
     },
     {
       name: "Code",
-      url: "",
+      url: "https://github.com/yyDing1/FAPO",
       icon: "ri:github-line",
     },
     {
@@ -101,13 +101,18 @@ export const components = {pre: CodeBlock, table: Table}
     },
     {
       name: "Collection",
-      url: "https://huggingface.co/collections/dyyyyyyyy/fapo-68e651650ba668ae5b541f1c",
+      url: "https://huggingface.co/collections/dyyyyyyyy/fapo",
       icon: "simple-icons:huggingface"
+    },
+    {
+      name: "Infra Doc",
+      url: "https://verl.readthedocs.io/en/latest/advance/reward_loop.html",
+      icon: "ri:file-pdf-2-line",
     }
   ]}
 />
 
-_We have also implemented a more flexible and easy-to-use infra design for reward models, which has been added to the [veRL](https://github.com/volcengine/verl) repo in [this PR](https://github.com/volcengine/verl/pull/3679) and will be merged as a key feature in a future release. Welcome to use it!_
+_We have also implemented a more flexible and easy-to-use infra design for reward models, which has been added to the [veRL](https://github.com/volcengine/verl) repo with details in [this doc](https://verl.readthedocs.io/en/latest/advance/reward_loop.html) and will be merged as a key feature in a future release. Welcome to use it!_
 
 <Figure>
   <Image slot="figure" source={introMain} altText="Comparison between FAPO models and their baselines thoughout RL training." />
